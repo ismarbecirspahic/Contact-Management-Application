@@ -14,14 +14,14 @@ app.use(bodyParser.json());
 const contactsRoute = require("./routes/contactRoutes");
 app.use("/contacts", contactsRoute);
 
-sequelize
-  .sync()
-  .then(() => {
+(async () => {
+  try {
+    await sequelize.sync({ force: false });
     console.log("Database synchronized.");
     app.listen(PORT, () => {
       console.log(`Server is listening at port ${PORT}`);
     });
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error("Error synchronizing database:", error);
-  });
+  }
+})();

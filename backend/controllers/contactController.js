@@ -1,4 +1,5 @@
 const { Contact } = require("../models");
+const { Op } = require("sequelize");
 
 class ContactController {
   async getAllContacts(req, res) {
@@ -61,6 +62,35 @@ class ContactController {
       res.status(200).send("Deletion was successful");
     } catch (err) {
       console.error("Error deleting contact:", err.message);
+    }
+  }
+
+  async restoreContact(req, res) {
+    const contactId = req.params.id;
+    try {
+      await Contact.restore({ where: { id: contactId } });
+      res.status(200).send("Contact restored successfully");
+    } catch (err) {
+      console.error("Error restoring a contact:", err.message);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+
+  async getDeletedContacts(req, res) {
+    console.log(req.query);
+    try {
+      const deletedContacts = await Contact.findAll({
+        where: {
+          deletedAt: {
+            [Op.not]: null,
+          },
+        },
+        paranoid: false,
+      });
+
+      res.status(200).json(deletedContacts);
+    } catch (error) {
+      console.error("Error fetching deleted contacts:", error.message);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
