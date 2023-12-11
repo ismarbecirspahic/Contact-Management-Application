@@ -1,10 +1,10 @@
 import React from "react";
-import ContactsList from "./components/contactList";
+import ContactList from "./components/ContactList";
 
 const App = () => {
   return (
     <div>
-      <ContactsList />
+      <ContactList />
     </div>
   );
 };

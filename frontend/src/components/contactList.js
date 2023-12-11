@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+import ContactsListDisplay from "./ContactsListDisplay";
+import ContactsModal from "./ContactsModal";
+import ContactsSearch from "./ContactsSearch";
+import ContactsActions from "./ContactsActions";
+
 const ContactsList = () => {
   const [contacts, setContacts] = useState([]);
+  const [deletedContacts, setDeletedContacts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [contact, setContact] = useState({
@@ -23,6 +29,21 @@ const ContactsList = () => {
     contact_group: "other",
   });
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredContacts = contacts.filter((contact) => {
+    const fullName = `${contact.firstName} ${contact.lastName}`;
+    return (
+      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      contact.phone_number.toString().includes(searchTerm)
+    );
+  });
+
   useEffect(() => {
     fetchContacts();
   }, []);
@@ -34,6 +55,33 @@ const ContactsList = () => {
         setContacts(response.data);
       })
       .catch((error) => console.error("Error fetching contacts:", error));
+  };
+
+  const fetchDeletedContacts = () => {
+    axios
+      .get("http://localhost:3300/contacts/deleted")
+      .then((response) => {
+        setDeletedContacts(response.data);
+      })
+      .catch((error) =>
+        console.error("Error fetching deleted contacts:", error)
+      );
+  };
+
+  const handleShowDeletedContacts = () => {
+    fetchDeletedContacts();
+  };
+
+  const handleRestoreContact = async (deletedContactId) => {
+    try {
+      await axios.put(
+        `http://localhost:3300/contacts/restore/${deletedContactId}`
+      );
+      fetchContacts();
+      fetchDeletedContacts();
+    } catch (error) {
+      console.error("Error restoring contact:", error.message);
+    }
   };
 
   const handleAddContact = () => {
@@ -88,6 +136,7 @@ const ContactsList = () => {
     try {
       await axios.delete(`http://localhost:3300/contacts/${contactId}`);
       fetchContacts();
+      fetchDeletedContacts();
       console.log(`Delete contact clicked for contact ID: ${contactId}`);
     } catch (err) {
       console.error("Error while deleting data", err.message);
@@ -97,207 +146,33 @@ const ContactsList = () => {
   return (
     <div>
       <h1>Contact List</h1>
-
-      <button onClick={handleAddContact}>Add</button>
-
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setIsModalOpen(false)}>
-              &times;
-            </span>
-            <h2>Add Contact</h2>
-            <form>
-              <label>
-                First name:
-                <input
-                  type="text"
-                  value={contact.firstName}
-                  onChange={(e) =>
-                    setContact({ ...contact, firstName: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Last name:
-                <input
-                  type="text"
-                  value={contact.lastName}
-                  onChange={(e) =>
-                    setContact({ ...contact, lastName: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Email:
-                <input
-                  type="email"
-                  value={contact.email}
-                  onChange={(e) =>
-                    setContact({ ...contact, email: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Phone Number:
-                <input
-                  type="text"
-                  value={contact.phone_number}
-                  onChange={(e) =>
-                    setContact({
-                      ...contact,
-                      phone_number: e.target.value,
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Address:
-                <input
-                  type="text"
-                  value={contact.address}
-                  onChange={(e) =>
-                    setContact({ ...contact, address: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Contact Group:
-                <select
-                  value={contact.contact_group}
-                  onChange={(e) =>
-                    setContact({
-                      ...contact,
-                      contact_group: e.target.value,
-                    })
-                  }
-                >
-                  <option value="other">Other</option>
-                  <option value="colleagues">Colleagues</option>
-                  <option value="friends">Friends</option>
-                  <option value="family">Family</option>
-                </select>
-              </label>
-
-              <button type="button" onClick={handleSaveContact}>
-                Save
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      <ul>
-        {contacts.map((contact) => (
-          <li key={contact.id}>
-            {contact.firstName} - {contact.lastName} - {contact.email} -{" "}
-            {contact.phone_number} - {contact.address} - {contact.contact_group}
-            <button onClick={() => handleUpdateContact(contact.id, contact)}>
-              Edit
-            </button>
-            <button onClick={() => handleDeleteContact(contact.id)}>
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-      {isEditModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={() => setIsEditModalOpen(false)}>
-              &times;
-            </span>
-            <h2>Edit Contact</h2>
-            <form>
-              <label>
-                First name:
-                <input
-                  type="text"
-                  value={editedContact.firstName}
-                  onChange={(e) =>
-                    setEditedContact({
-                      ...editedContact,
-                      firstName: e.target.value,
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Last name:
-                <input
-                  type="text"
-                  value={editedContact.lastName}
-                  onChange={(e) =>
-                    setEditedContact({
-                      ...editedContact,
-                      lastName: e.target.value,
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Email:
-                <input
-                  type="email"
-                  value={editedContact.email}
-                  onChange={(e) =>
-                    setEditedContact({
-                      ...editedContact,
-                      email: e.target.value,
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Phone Number:
-                <input
-                  type="number"
-                  value={editedContact.phone_number}
-                  onChange={(e) =>
-                    setEditedContact({
-                      ...editedContact,
-                      phone_number: e.target.value,
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Address:
-                <input
-                  type="text"
-                  value={editedContact.address}
-                  onChange={(e) =>
-                    setEditedContact({
-                      ...editedContact,
-                      address: e.target.value,
-                    })
-                  }
-                />
-              </label>
-              <label>
-                Contact Group:
-                <select
-                  value={editedContact.contact_group}
-                  onChange={(e) =>
-                    setEditedContact({
-                      ...editedContact,
-                      contact_group: e.target.value,
-                    })
-                  }
-                >
-                  <option value="other">Other</option>
-                  <option value="colleagues">Colleagues</option>
-                  <option value="friends">Friends</option>
-                  <option value="family">Family</option>
-                </select>
-                <button onClick={() => handleEditContact(editedContact.id)}>
-                  Update
-                </button>
-              </label>
-            </form>
-          </div>
-        </div>
-      )}
+      <ContactsSearch
+        searchTerm={searchTerm}
+        handleSearchChange={handleSearchChange}
+      />
+      <ContactsActions
+        handleAddContact={handleAddContact}
+        handleShowDeletedContacts={handleShowDeletedContacts}
+      />
+      <ContactsModal
+        isModalOpen={isModalOpen}
+        contact={contact}
+        setContact={setContact}
+        handleSaveContact={handleSaveContact}
+        setIsModalOpen={setIsModalOpen}
+      />
+      <ContactsListDisplay
+        filteredContacts={filteredContacts}
+        handleUpdateContact={handleUpdateContact}
+        handleDeleteContact={handleDeleteContact}
+        deletedContacts={deletedContacts}
+        handleRestoreContact={handleRestoreContact}
+        isEditModalOpen={isEditModalOpen}
+        editedContact={editedContact}
+        setEditedContact={setEditedContact}
+        handleEditContact={handleEditContact}
+        setIsEditModalOpen={setIsEditModalOpen}
+      />
     </div>
   );
 };
