@@ -27,7 +27,6 @@ module.exports = {
       },
       address: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
       contact_group: {
         type: Sequelize.STRING,

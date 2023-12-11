@@ -4,13 +4,23 @@ const ContactsModal = ({
   setContact,
   handleSaveContact,
   setIsModalOpen,
+  validationErrors,
 }) => {
   return (
     <>
       {isModalOpen && (
         <div className="modal">
           <div className="modal-content">
-            <span className="close" onClick={() => setIsModalOpen(false)}>
+            <span
+              className="close"
+              style={{
+                color: "darkred",
+                fontSize: "20px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+              onClick={() => setIsModalOpen(false)}
+            >
               &times;
             </span>
             <h2>Add Contact</h2>
@@ -23,7 +33,13 @@ const ContactsModal = ({
                   onChange={(e) =>
                     setContact({ ...contact, firstName: e.target.value })
                   }
+                  style={inputStyle}
                 />
+                {validationErrors.firstName && (
+                  <span style={error} className="error">
+                    {validationErrors.firstName}
+                  </span>
+                )}
               </label>
               <label>
                 Last name:
@@ -33,7 +49,13 @@ const ContactsModal = ({
                   onChange={(e) =>
                     setContact({ ...contact, lastName: e.target.value })
                   }
+                  style={inputStyle}
                 />
+                {validationErrors.lastName && (
+                  <span style={error} className="error">
+                    {validationErrors.lastName}
+                  </span>
+                )}
               </label>
               <label>
                 Email:
@@ -43,7 +65,13 @@ const ContactsModal = ({
                   onChange={(e) =>
                     setContact({ ...contact, email: e.target.value })
                   }
+                  style={inputStyle}
                 />
+                {validationErrors.email && (
+                  <span style={error} className="error">
+                    {validationErrors.email}
+                  </span>
+                )}
               </label>
               <label>
                 Phone Number:
@@ -56,7 +84,13 @@ const ContactsModal = ({
                       phone_number: e.target.value,
                     })
                   }
+                  style={inputStyle}
                 />
+                {validationErrors.phone_number && (
+                  <span style={error} className="error">
+                    {validationErrors.phone_number}
+                  </span>
+                )}
               </label>
               <label>
                 Address:
@@ -66,6 +100,7 @@ const ContactsModal = ({
                   onChange={(e) =>
                     setContact({ ...contact, address: e.target.value })
                   }
+                  style={inputStyle}
                 />
               </label>
               <label>
@@ -78,6 +113,7 @@ const ContactsModal = ({
                       contact_group: e.target.value,
                     })
                   }
+                  style={inputStyle}
                 >
                   <option value="other">Other</option>
                   <option value="colleagues">Colleagues</option>
@@ -86,7 +122,18 @@ const ContactsModal = ({
                 </select>
               </label>
 
-              <button type="button" onClick={handleSaveContact}>
+              <button
+                type="button"
+                onClick={handleSaveContact}
+                style={{
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  padding: "10px 15px",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
                 Save
               </button>
             </form>
@@ -95,5 +142,19 @@ const ContactsModal = ({
       )}
     </>
   );
+};
+
+const inputStyle = {
+  padding: "8px",
+  margin: "5px 0",
+  width: "100%",
+  boxSizing: "border-box",
+  borderRadius: "4px",
+  border: "1px solid #ccc",
+};
+
+const error = {
+  color: "red",
+  fontWeight: "bold",
 };
 export default ContactsModal;
