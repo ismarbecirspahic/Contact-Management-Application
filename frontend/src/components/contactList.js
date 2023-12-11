@@ -48,7 +48,8 @@ const ContactsList = () => {
     return (
       fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.phone_number.toString().includes(searchTerm)
+      contact.phone_number.toString().includes(searchTerm) ||
+      contact.address.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
 
