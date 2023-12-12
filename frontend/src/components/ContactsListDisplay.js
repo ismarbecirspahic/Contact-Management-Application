@@ -11,6 +11,9 @@ const ContactsListDisplay = ({
   handleEditContact,
   setIsEditModalOpen,
   validationErrors,
+  setIsCategorySelected,
+  setSelectedCategoryId,
+  selectedCategoryId,
 }) => {
   const [categories, setCategories] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -26,6 +29,11 @@ const ContactsListDisplay = ({
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
+  };
+  const handleCategorySelect = (categoryId) => {
+    setSelectedCategoryId(categoryId);
+    setIsCategorySelected(true);
+    setEditedContact({ ...editedContact, categoryId });
   };
 
   const getCategoryNameById = (categoryId) => {
@@ -217,23 +225,24 @@ const ContactsListDisplay = ({
                 />
               </label>
               <label>
-                Category
+                Category:
                 <select
-                  value={editedContact.categoryId}
-                  onChange={(e) =>
-                    setEditedContact({
-                      ...editedContact,
-                      categoryId: e.target.value,
-                    })
-                  }
                   style={inputStyle}
+                  onChange={(e) => handleCategorySelect(e.target.value)}
+                  value={selectedCategoryId}
                 >
+                  <option value="" disabled hidden>
+                    Select a category
+                  </option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
                   ))}
                 </select>
+                {validationErrors.category && (
+                  <span className="error">{validationErrors.category}</span>
+                )}
               </label>
               <button
                 style={{

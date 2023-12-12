@@ -1,4 +1,3 @@
-import { useState } from "react";
 import CategoriesSelector from "./CategoriesSelector";
 const ContactsModal = ({
   isModalOpen,
@@ -9,18 +8,10 @@ const ContactsModal = ({
   validationErrors,
   category,
   setCategory,
+  selectedCategoryId,
+  handleCategorySelect,
+  isCategorySelected,
 }) => {
-  const [selectedCategoryId, setSelectedCategoryId] = useState(
-    category.id || ""
-  );
-
-  const [isCategorySelected, setIsCategorySelected] = useState(true);
-
-  const handleCategorySelect = (categoryId) => {
-    setSelectedCategoryId(categoryId);
-    setIsCategorySelected(true);
-    setContact({ ...contact, categoryId });
-  };
   return (
     <>
       {isModalOpen && (

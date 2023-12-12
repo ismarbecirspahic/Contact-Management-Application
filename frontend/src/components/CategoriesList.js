@@ -122,7 +122,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
               >
                 {category.name}
               </p>
-              {category.name !== "Other" && (
+              {category.id !== 1 && (
                 <div
                   style={{
                     display: "flex",
