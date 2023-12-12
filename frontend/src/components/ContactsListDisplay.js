@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const ContactsListDisplay = ({
   filteredContacts,
@@ -11,29 +12,71 @@ const ContactsListDisplay = ({
   setIsEditModalOpen,
   validationErrors,
 }) => {
+  const [categories, setCategories] = useState([]);
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("http://localhost:3300/categories");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const getCategoryNameById = (categoryId) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category ? category.name : "";
+  };
+
+  const handleSortChange = () => {
+    setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
+  };
+
+  const sortedContacts = [...filteredContacts].sort((a, b) => {
+    const categoryA = getCategoryNameById(a.categoryId);
+    const categoryB = getCategoryNameById(b.categoryId);
+
+    if (sortOrder === "asc") {
+      return categoryA.localeCompare(categoryB);
+    } else {
+      return categoryB.localeCompare(categoryA);
+    }
+  });
+
   return (
     <>
+      <div>
+        <button onClick={handleSortChange}>
+          Sort by Category ({sortOrder === "asc" ? "Ascending" : "Descending"})
+        </button>
+      </div>
+
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr style={tableHeaderStyle}>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Phone Number</th>
-            <th>Address</th>
-            <th>Contact Group</th>
-            <th>Actions</th>
+            <th style={{ padding: "30px", margin: "0 10px" }}>First Name</th>
+            <th style={{ padding: "30px", margin: "0 10px" }}>Last Name</th>
+            <th style={{ padding: "30px", margin: "0 10px" }}>Email</th>
+            <th style={{ padding: "30px", margin: "0 10px" }}>Phone Number</th>
+            <th style={{ padding: "30px", margin: "0 10px" }}>Address</th>
+            <th style={{ padding: "30px", margin: "0 10px" }}>Category</th>
+            <th style={{ padding: "30px", margin: "0 10px" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredContacts.map((contact) => (
+          {sortedContacts.map((contact) => (
             <tr key={contact.id} style={tableRowStyle}>
               <td>{contact.firstName}</td>
               <td>{contact.lastName}</td>
               <td>{contact.email}</td>
               <td>{contact.phone_number}</td>
               <td>{contact.address}</td>
-              <td>{contact.contact_group}</td>
+              <td>{getCategoryNameById(contact.categoryId)}</td>
               <td>
                 <button
                   style={actionButtonStyle}
@@ -144,38 +187,39 @@ const ContactsListDisplay = ({
                 />
               </label>
               <label>
-                Contact Group:
+                Category
                 <select
-                  value={editedContact.contact_group}
+                  value={editedContact.categoryId}
                   onChange={(e) =>
                     setEditedContact({
                       ...editedContact,
-                      contact_group: e.target.value,
+                      categoryId: e.target.value,
                     })
                   }
                   style={inputStyle}
                 >
-                  <option value="other">Other</option>
-                  <option value="colleagues">Colleagues</option>
-                  <option value="friends">Friends</option>
-                  <option value="family">Family</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
-                <button
-                  style={{
-                    backgroundColor: "white",
-                    color: "#4CAF50",
-                    padding: "10px 15px",
-                    border: "2px solid #4CAF50",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                  onClick={(e) => {
-                    handleEditContact(e, editedContact.id);
-                  }}
-                >
-                  Update
-                </button>
               </label>
+              <button
+                style={{
+                  backgroundColor: "white",
+                  color: "#4CAF50",
+                  padding: "10px 15px",
+                  border: "2px solid #4CAF50",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+                onClick={(e) => {
+                  handleEditContact(e, editedContact.id);
+                }}
+              >
+                Update
+              </button>
             </form>
           </div>
         </div>
@@ -195,13 +239,11 @@ const inputStyle = {
 const tableHeaderStyle = {
   backgroundColor: "#4CAF50",
   color: "white",
-  padding: "20px",
   textAlign: "center",
 };
 
 const tableRowStyle = {
   borderBottom: "1px solid #ddd",
-  padding: "8px",
   textAlign: "center",
 };
 

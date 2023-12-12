@@ -28,8 +28,14 @@ module.exports = {
       address: {
         type: Sequelize.STRING,
       },
-      contact_group: {
-        type: Sequelize.STRING,
+      categoryId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: {
+            tableName: "Categories",
+          },
+          key: "id",
+        },
         allowNull: false,
       },
       createdAt: {

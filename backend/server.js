@@ -14,6 +14,9 @@ app.use(bodyParser.json());
 const contactsRoute = require("./routes/contactRoutes");
 app.use("/contacts", contactsRoute);
 
+const categoryRoute = require("./routes/categoryRoutes");
+app.use("/categories", categoryRoute);
+
 (async () => {
   try {
     await sequelize.sync({ force: false });

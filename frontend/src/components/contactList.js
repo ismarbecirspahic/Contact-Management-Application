@@ -3,11 +3,14 @@ import axios from "axios";
 
 import ContactsListDisplay from "./ContactsListDisplay";
 import ContactsModal from "./ContactsModal";
-import ContactsSearch from "./ContactsSearch";
 import ContactsActions from "./ContactsActions";
 
-const ContactsList = () => {
-  const [contacts, setContacts] = useState([]);
+const ContactsList = ({
+  filteredContacts,
+  fetchContacts,
+  category,
+  setCategory,
+}) => {
   const [deletedContacts, setDeletedContacts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -18,7 +21,7 @@ const ContactsList = () => {
     email: "",
     phone_number: "",
     address: "",
-    contact_group: "",
+    categoryId: null,
   });
   const [editedContact, setEditedContact] = useState({
     id: null,
@@ -27,7 +30,7 @@ const ContactsList = () => {
     email: "",
     phone_number: "",
     address: "",
-    contact_group: "other",
+    categoryId: null,
   });
 
   const [validationErrors, setValidationErrors] = useState({
@@ -36,35 +39,6 @@ const ContactsList = () => {
     email: "",
     phone_number: "",
   });
-
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const filteredContacts = contacts.filter((contact) => {
-    const fullName = `${contact.firstName} ${contact.lastName}`;
-    return (
-      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contact.phone_number.toString().includes(searchTerm) ||
-      contact.address.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
-
-  useEffect(() => {
-    fetchContacts();
-  }, []);
-
-  const fetchContacts = async () => {
-    await axios
-      .get("http://localhost:3300/contacts")
-      .then((response) => {
-        setContacts(response.data);
-      })
-      .catch((error) => console.error("Error fetching contacts:", error));
-  };
 
   const fetchDeletedContacts = async () => {
     await axios
@@ -78,7 +52,7 @@ const ContactsList = () => {
   };
 
   const handleShowDeletedContacts = () => {
-    setIsDeleteModalOpen(true);
+    setIsDeleteModalOpen(!isDeleteModalOpen);
     fetchDeletedContacts();
   };
 
@@ -101,7 +75,7 @@ const ContactsList = () => {
       email: "",
       phone_number: "",
       address: "",
-      contact_group: "other",
+      categoryId: null,
     });
     setIsModalOpen(true);
   };
@@ -139,6 +113,10 @@ const ContactsList = () => {
       isValid = false;
     } else if (!/^\d{1,9}$/.test(contact.phone_number)) {
       errors.phone_number = "Phone Number must be a maximum of 9 digits";
+      isValid = false;
+    }
+    if (contact.categoryId === null) {
+      errors.categoryId = "Please select a category";
       isValid = false;
     }
 
@@ -202,7 +180,7 @@ const ContactsList = () => {
       email: contact.email,
       phone_number: contact.phone_number,
       address: contact.address,
-      contact_group: contact.contact_group,
+      categoryId: contact.categoryId,
     });
   };
 
@@ -239,16 +217,10 @@ const ContactsList = () => {
     <div
       style={{
         fontFamily: "Arial, sans-serif",
-        maxWidth: "800px",
-        margin: "auto",
+
         padding: "20px",
       }}
     >
-      <h1 style={{ textAlign: "center", color: "#333" }}>Contact List</h1>
-      <ContactsSearch
-        searchTerm={searchTerm}
-        handleSearchChange={handleSearchChange}
-      />
       <ContactsActions
         handleAddContact={handleAddContact}
         handleShowDeletedContacts={handleShowDeletedContacts}
@@ -263,6 +235,8 @@ const ContactsList = () => {
         handleSaveContact={handleSaveContact}
         setIsModalOpen={setIsModalOpen}
         validationErrors={validationErrors}
+        category={category}
+        setCategory={setCategory}
       />
       <ContactsListDisplay
         filteredContacts={filteredContacts}

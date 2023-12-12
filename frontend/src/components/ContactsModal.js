@@ -1,3 +1,5 @@
+import { useState } from "react";
+import CategoriesSelector from "./CategoriesSelector";
 const ContactsModal = ({
   isModalOpen,
   contact,
@@ -5,7 +7,20 @@ const ContactsModal = ({
   handleSaveContact,
   setIsModalOpen,
   validationErrors,
+  category,
+  setCategory,
 }) => {
+  const [selectedCategoryId, setSelectedCategoryId] = useState(
+    category.id || ""
+  );
+
+  const [isCategorySelected, setIsCategorySelected] = useState(true);
+
+  const handleCategorySelect = (categoryId) => {
+    setSelectedCategoryId(categoryId);
+    setIsCategorySelected(true);
+    setContact({ ...contact, categoryId });
+  };
   return (
     <>
       {isModalOpen && (
@@ -103,24 +118,14 @@ const ContactsModal = ({
                   style={inputStyle}
                 />
               </label>
-              <label>
-                Contact Group:
-                <select
-                  value={contact.contact_group}
-                  onChange={(e) =>
-                    setContact({
-                      ...contact,
-                      contact_group: e.target.value,
-                    })
-                  }
-                  style={inputStyle}
-                >
-                  <option value="other">Other</option>
-                  <option value="colleagues">Colleagues</option>
-                  <option value="friends">Friends</option>
-                  <option value="family">Family</option>
-                </select>
-              </label>
+              <CategoriesSelector
+                onSelectCategory={handleCategorySelect}
+                selectedCategory={selectedCategoryId}
+                validationErrors={validationErrors}
+              />
+              {!isCategorySelected && (
+                <span className="error">Please select a category.</span>
+              )}
 
               <button
                 type="button"
@@ -134,7 +139,7 @@ const ContactsModal = ({
                   cursor: "pointer",
                 }}
               >
-                Save
+                Save Contact
               </button>
             </form>
           </div>

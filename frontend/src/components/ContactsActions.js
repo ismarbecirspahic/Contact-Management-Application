@@ -22,7 +22,7 @@ const ContactsActions = ({
         }}
         onClick={handleAddContact}
       >
-        Add
+        Add Contact
       </button>
       {deletedContacts.length > 0 && (
         <button
@@ -49,7 +49,7 @@ const ContactsActions = ({
               <li key={deletedContact.id}>
                 {deletedContact.firstName} - {deletedContact.lastName} -{" "}
                 {deletedContact.email} - {deletedContact.phone_number} -{" "}
-                {deletedContact.address} - {deletedContact.contact_group}
+                {deletedContact.address} - {deletedContact.categoryId}
                 <button
                   style={{
                     backgroundColor: "white",
