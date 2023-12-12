@@ -217,7 +217,6 @@ const ContactsList = ({
     <div
       style={{
         fontFamily: "Arial, sans-serif",
-
         padding: "20px",
       }}
     >

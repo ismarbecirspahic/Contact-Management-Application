@@ -51,7 +51,18 @@ const ContactsListDisplay = ({
   return (
     <>
       <div>
-        <button onClick={handleSortChange}>
+        <button
+          onClick={handleSortChange}
+          style={{
+            backgroundColor: "transparent",
+            color: "#4CAF50",
+            padding: "10px 15px",
+            border: "none",
+            cursor: "pointer",
+            marginBottom: "5px",
+            fontWeight: "bold",
+          }}
+        >
           Sort by Category ({sortOrder === "asc" ? "Ascending" : "Descending"})
         </button>
       </div>
@@ -71,13 +82,27 @@ const ContactsListDisplay = ({
         <tbody>
           {sortedContacts.map((contact) => (
             <tr key={contact.id} style={tableRowStyle}>
-              <td>{contact.firstName}</td>
-              <td>{contact.lastName}</td>
-              <td>{contact.email}</td>
-              <td>{contact.phone_number}</td>
-              <td>{contact.address}</td>
-              <td>{getCategoryNameById(contact.categoryId)}</td>
-              <td>
+              <td style={{ padding: "10px", margin: "0 10px" }}>
+                {contact.firstName}
+              </td>
+              <td style={{ padding: "10px", margin: "0 10px" }}>
+                {contact.lastName}
+              </td>
+              <td style={{ padding: "10px", margin: "0 10px" }}>
+                {contact.email}
+              </td>
+              <td style={{ padding: "10px", margin: "0 10px" }}>
+                {contact.phone_number}
+              </td>
+              <td style={{ padding: "10px", margin: "0 10px" }}>
+                {contact.address}
+              </td>
+              <td style={{ padding: "10px", margin: "0 10px" }}>
+                {getCategoryNameById(contact.categoryId)}
+              </td>
+              <td
+                style={{ display: "flex", padding: "10px", margin: "0 10px" }}
+              >
                 <button
                   style={actionButtonStyle}
                   onClick={() => handleUpdateContact(contact.id, contact)}
@@ -85,7 +110,12 @@ const ContactsListDisplay = ({
                   Edit
                 </button>
                 <button
-                  style={actionButtonStyle}
+                  style={{
+                    backgroundColor: "red",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                  }}
                   onClick={() => handleDeleteContact(contact.id)}
                 >
                   Delete
@@ -248,10 +278,10 @@ const tableRowStyle = {
 };
 
 const actionButtonStyle = {
-  backgroundColor: "white",
-  color: "#4CAF50",
+  backgroundColor: "#4CAF50",
+  color: "white",
   padding: "10px 15px",
-  border: "2px solid #4CAF50",
+  border: "none",
   borderRadius: "4px",
   cursor: "pointer",
   marginRight: "5px",

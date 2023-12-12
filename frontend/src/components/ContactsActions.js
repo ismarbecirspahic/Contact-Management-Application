@@ -8,7 +8,14 @@ const ContactsActions = ({
   handleRestoreContact,
 }) => {
   return (
-    <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "10px",
+      }}
+    >
       <button
         type="button"
         style={{
@@ -18,21 +25,20 @@ const ContactsActions = ({
           border: "none",
           borderRadius: "4px",
           cursor: "pointer",
-          marginBottom: "10px",
         }}
         onClick={handleAddContact}
       >
         Add Contact
       </button>
-      {deletedContacts.length > 0 && (
+      {deletedContacts.length !== 0 && (
         <button
           type="button"
           style={{
-            backgroundColor: "white",
-            color: "#4CAF50",
+            backgroundColor: "red",
+            color: "white",
             padding: "10px 15px",
-            border: "2px solid #4CAF50",
             borderRadius: "4px",
+            border: "none",
             cursor: "pointer",
           }}
           onClick={handleShowDeletedContacts}
@@ -41,7 +47,7 @@ const ContactsActions = ({
         </button>
       )}
 
-      {isDeleteModalOpen && (
+      {isDeleteModalOpen && deletedContacts.length !== 0 && (
         <div>
           <h2>Deleted Contacts</h2>
           <ul>

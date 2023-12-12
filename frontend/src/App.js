@@ -9,6 +9,7 @@ import { useEffect } from "react";
 const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [contacts, setContacts] = useState([]);
+
   const [category, setCategory] = useState({
     name: "",
   });
