@@ -151,8 +151,9 @@ const App = () => {
   const handleSaveContact = async () => {
     if (validateForm()) {
       await axios.post("http://localhost:3300/contacts", contact);
-      setSelectedCategoryId("");
       fetchContacts();
+
+      setSelectedCategoryId("");
       setIsModalOpen(false);
     }
   };
