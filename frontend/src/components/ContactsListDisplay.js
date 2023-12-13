@@ -120,7 +120,16 @@ const ContactsListDisplay = ({
       {isEditModalOpen && (
         <div style={modal}>
           <div style={modalContent}>
-            <span className="close" onClick={() => setIsEditModalOpen(false)}>
+            <span
+              className="close"
+              style={{
+                color: "darkred",
+                fontSize: "20px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+              onClick={() => setIsEditModalOpen(false)}
+            >
               &times;
             </span>
             <h2>Edit Contact</h2>

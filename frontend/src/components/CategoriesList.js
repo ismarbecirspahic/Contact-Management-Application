@@ -1,7 +1,5 @@
 import React from "react";
-
 import { useState, useEffect } from "react";
-
 import axios from "axios";
 
 const CategoriesList = ({ fetchContacts, category, setCategory }) => {
@@ -27,6 +25,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
       console.error("Error fetching categories:", error);
     }
   };
+
   const handleAddCategory = () => {
     setCategory({
       name: "",
@@ -35,6 +34,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
     setIsDeleteModalOpen(false);
     setisEditModalOpen(false);
   };
+
   const handleUpdateCategory = (categoryId, category) => {
     setisEditModalOpen(!isEditModalOpen);
     setIsModalOpen(false);
@@ -77,6 +77,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
     fetchCategories();
     setIsModalOpen(false);
   };
+
   const fetchDeletedCategories = async () => {
     await axios
       .get("http://localhost:3300/categories/deleted")
@@ -115,14 +116,8 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
         >
           <h2>Categories:</h2>
           {categories.map((category) => (
-            <div>
-              <p
-                style={{ marginBottom: "5px" }}
-                key={category.id}
-                value={category.id}
-              >
-                {category.name}
-              </p>
+            <div key={category.id}>
+              <p style={{ marginBottom: "5px" }}>{category.name}</p>
               {category.id !== 1 && (
                 <div
                   style={{
@@ -133,23 +128,13 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
                   }}
                 >
                   <button
-                    style={{
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                    }}
+                    style={editButtonStyle}
                     onClick={() => handleUpdateCategory(category.id, category)}
                   >
                     Edit
                   </button>
                   <button
-                    style={{
-                      backgroundColor: "red",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                    }}
+                    style={deleteButtonStyle}
                     onClick={() => handleDeleteCategory(category.id)}
                   >
                     Delete
@@ -159,62 +144,50 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
             </div>
           ))}
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
+        <div style={buttonContainerStyle}>
           {isEditModalOpen && (
-            <div className="modal">
-              <div className="modal-content">
-                <h2>Edit Category</h2>
-                <form>
-                  <label>
-                    Name:
-                    <input
-                      type="text"
-                      value={editedcategory.name}
-                      onChange={(e) =>
-                        setEditedcategory({
-                          ...editedcategory,
-                          name: e.target.value,
-                        })
-                      }
-                      style={inputStyle}
-                    />
-                  </label>
-                  <button
-                    style={{
-                      backgroundColor: "white",
-                      color: "#4CAF50",
-                      padding: "10px 15px",
-                      border: "2px solid #4CAF50",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                    onClick={(e) => {
-                      handleEditCategory(e, editedcategory.id);
-                    }}
-                  >
-                    Update
-                  </button>
-                </form>
-              </div>
+            <div style={modalStyle}>
+              <span
+                className="close"
+                style={{
+                  color: "darkred",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+                onClick={() => setisEditModalOpen(false)}
+              >
+                &times;
+              </span>
+
+              <h2>Edit Category</h2>
+              <form>
+                <label>
+                  Name:
+                  <input
+                    type="text"
+                    value={editedcategory.name}
+                    onChange={(e) =>
+                      setEditedcategory({
+                        ...editedcategory,
+                        name: e.target.value,
+                      })
+                    }
+                    style={inputStyle}
+                  />
+                </label>
+                <button
+                  style={updateButtonStyle}
+                  onClick={(e) => handleEditCategory(e, editedcategory.id)}
+                >
+                  Update
+                </button>
+              </form>
             </div>
           )}
           <button
             type="button"
-            style={{
-              backgroundColor: "#4CAF50",
-              color: "white",
-              padding: "10px 15px",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              marginBottom: "10px",
-            }}
+            style={addButtonStyle}
             onClick={handleAddCategory}
           >
             Add Category
@@ -222,14 +195,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
 
           <button
             type="button"
-            style={{
-              backgroundColor: "white",
-              color: "#4CAF50",
-              padding: "10px 15px",
-              border: "2px solid #4CAF50",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
+            style={showDeletedButtonStyle}
             onClick={handleShowDeletedCategories}
           >
             Show Deleted Contacts
@@ -237,27 +203,12 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
           {isDeleteModalOpen && deletedCategories.length !== 0 && (
             <div>
               <h2>Deleted Categories</h2>
-              <ul style={{ overflowY: "auto", maxHeight: "150px" }}>
+              <ul style={deletedListStyle}>
                 {deletedCategories.map((deletedCategory) => (
-                  <li
-                    style={{
-                      listStyleType: "none",
-                      textAlign: "center",
-                      display: "flex",
-                      gap: "5px",
-                      justifyContent: "space-between",
-                      margin: "10px 0",
-                    }}
-                    key={deletedCategory.id}
-                  >
+                  <li key={deletedCategory.id} style={deletedListItemStyle}>
                     {deletedCategory.name}
                     <button
-                      style={{
-                        backgroundColor: "#4CAF50",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                      }}
+                      style={addButtonStyle}
                       onClick={() => handleRestoreCategory(deletedCategory.id)}
                     >
                       Restore
@@ -269,7 +220,19 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
           )}
 
           {isModalOpen && (
-            <div>
+            <div style={modalStyle}>
+              <span
+                className="close"
+                style={{
+                  color: "darkred",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+                onClick={() => setIsModalOpen(false)}
+              >
+                &times;
+              </span>
               <h2>Add Category</h2>
               <form>
                 <label>
@@ -283,19 +246,10 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
                     }
                   />
                 </label>
-
                 <button
                   type="button"
                   onClick={handleSaveCategory}
-                  style={{
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    padding: "10px 15px",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    width: "100%",
-                  }}
+                  style={saveButtonStyle}
                 >
                   Save
                 </button>
@@ -322,6 +276,92 @@ const inputStyle = {
   boxSizing: "border-box",
   borderRadius: "4px",
   border: "1px solid #ccc",
+};
+
+const addButtonStyle = {
+  backgroundColor: "#4CAF50",
+  color: "white",
+  padding: "10px 15px",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
+  marginBottom: "10px",
+};
+
+const showDeletedButtonStyle = {
+  backgroundColor: "white",
+  color: "#4CAF50",
+  padding: "10px 15px",
+  border: "2px solid #4CAF50",
+  borderRadius: "4px",
+  cursor: "pointer",
+};
+
+const editButtonStyle = {
+  backgroundColor: "#4CAF50",
+  color: "white",
+  border: "none",
+  borderRadius: "4px",
+};
+
+const deleteButtonStyle = {
+  backgroundColor: "red",
+  color: "white",
+  border: "none",
+  borderRadius: "4px",
+};
+
+const updateButtonStyle = {
+  backgroundColor: "white",
+  color: "#4CAF50",
+  padding: "10px 15px",
+  border: "2px solid #4CAF50",
+  borderRadius: "4px",
+  cursor: "pointer",
+};
+
+const saveButtonStyle = {
+  backgroundColor: "#4CAF50",
+  color: "white",
+  padding: "10px 15px",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
+  width: "100%",
+};
+
+const modalStyle = {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  backgroundColor: "white",
+  padding: "20px",
+  borderRadius: "8px",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+  zIndex: 1000,
+};
+
+const deletedListStyle = {
+  overflowY: "auto",
+  maxHeight: "150px",
+  padding: 0,
+  margin: 0,
+  listStyleType: "none",
+};
+
+const deletedListItemStyle = {
+  textAlign: "center",
+  display: "flex",
+  gap: "5px",
+  justifyContent: "space-between",
+  margin: "10px 0",
+};
+
+const buttonContainerStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
 };
 
 export default CategoriesList;
