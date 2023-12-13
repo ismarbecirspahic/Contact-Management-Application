@@ -15,8 +15,8 @@ const ContactsModal = ({
   return (
     <>
       {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
+        <div style={modal}>
+          <div style={modalContent}>
             <span
               className="close"
               style={{
@@ -42,9 +42,7 @@ const ContactsModal = ({
                   style={inputStyle}
                 />
                 {validationErrors.firstName && (
-                  <span style={error} className="error">
-                    {validationErrors.firstName}
-                  </span>
+                  <h5 style={error}>{validationErrors.firstName}</h5>
                 )}
               </label>
               <label>
@@ -58,9 +56,7 @@ const ContactsModal = ({
                   style={inputStyle}
                 />
                 {validationErrors.lastName && (
-                  <span style={error} className="error">
-                    {validationErrors.lastName}
-                  </span>
+                  <h5 style={error}>{validationErrors.lastName}</h5>
                 )}
               </label>
               <label>
@@ -74,9 +70,7 @@ const ContactsModal = ({
                   style={inputStyle}
                 />
                 {validationErrors.email && (
-                  <span style={error} className="error">
-                    {validationErrors.email}
-                  </span>
+                  <h5 style={error}>{validationErrors.email}</h5>
                 )}
               </label>
               <label>
@@ -93,9 +87,7 @@ const ContactsModal = ({
                   style={inputStyle}
                 />
                 {validationErrors.phone_number && (
-                  <span style={error} className="error">
-                    {validationErrors.phone_number}
-                  </span>
+                  <h5 style={error}>{validationErrors.phone_number}</h5>
                 )}
               </label>
               <label>
@@ -115,7 +107,7 @@ const ContactsModal = ({
                 validationErrors={validationErrors}
               />
               {!isCategorySelected && (
-                <span className="error">Please select a category.</span>
+                <h5 style={error}>Please select a category.</h5>
               )}
 
               <button
@@ -140,12 +132,31 @@ const ContactsModal = ({
   );
 };
 
+const modal = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  position: "fixed",
+  top: "0",
+  left: "0",
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+};
+
+const modalContent = {
+  backgroundColor: "#fefefe",
+  padding: "20px",
+  borderRadius: "8px",
+  width: "80%",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+};
+
 const inputStyle = {
   padding: "8px",
   margin: "5px 0",
-  width: "100%",
-  boxSizing: "border-box",
   borderRadius: "4px",
+  width: "100%",
   border: "1px solid #ccc",
 };
 

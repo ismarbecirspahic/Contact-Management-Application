@@ -21,7 +21,7 @@ const App = () => {
   const [deletedContacts, setDeletedContacts] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState({
     name: "",
   });
@@ -36,7 +36,17 @@ const App = () => {
 
   useEffect(() => {
     fetchContacts();
+    fetchCategories();
+    fetchDeletedContacts();
   }, []);
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("http://localhost:3300/categories");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const fetchContacts = async () => {
     await axios
@@ -139,13 +149,24 @@ const App = () => {
     return isValid;
   };
 
+  const getCategoryNameById = (categoryId) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category ? category.name : "";
+  };
+
   const filteredContacts = contacts.filter((contact) => {
     const fullName = `${contact.firstName} ${contact.lastName}`;
+    const categoryName = getCategoryNameById(contact.categoryId);
     return (
       fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contact.phone_number.toString().includes(searchTerm) ||
-      contact.address.toLowerCase().includes(searchTerm.toLowerCase())
+      contact.address
+        .toLowerCase()
+        .includes(
+          searchTerm.toLowerCase() ||
+            categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
   });
   const handleSaveContact = async () => {
@@ -189,7 +210,6 @@ const App = () => {
       <div
         style={{
           display: "flex",
-          alignItems: "center",
           justifyContent: "space-around",
         }}
       >
@@ -198,12 +218,13 @@ const App = () => {
           fetchDeletedContacts={fetchDeletedContacts}
           filteredContacts={filteredContacts}
           fetchContacts={fetchContacts}
-          category={category}
-          setCategory={setCategory}
           handleCategorySelect={handleCategorySelect}
           setIsCategorySelected={setIsCategorySelected}
           setSelectedCategoryId={setSelectedCategoryId}
           selectedCategoryId={selectedCategoryId}
+          categories={categories}
+          getCategoryNameById={getCategoryNameById}
+          setIsDeleteModalOpen={setIsDeleteModalOpen}
         />
         <CategoriesList
           fetchContacts={fetchContacts}

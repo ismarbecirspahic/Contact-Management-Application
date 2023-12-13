@@ -6,14 +6,15 @@ import ContactsListDisplay from "./ContactsListDisplay";
 const ContactsList = ({
   filteredContacts,
   fetchContacts,
-  category,
-  setCategory,
   deletedContacts,
   fetchDeletedContacts,
   handleCategorySelect,
   setSelectedCategoryId,
   setIsCategorySelected,
   selectedCategoryId,
+  categories,
+  getCategoryNameById,
+  setIsDeleteModalOpen,
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -113,6 +114,7 @@ const ContactsList = ({
       await axios.delete(`http://localhost:3300/contacts/${contactId}`);
       fetchContacts();
       fetchDeletedContacts();
+      setIsDeleteModalOpen(false);
       console.log(`Delete contact clicked for contact ID: ${contactId}`);
     } catch (err) {
       console.error("Error while deleting data", err.message);
@@ -141,6 +143,8 @@ const ContactsList = ({
         setIsCategorySelected={setIsCategorySelected}
         setSelectedCategoryId={setSelectedCategoryId}
         selectedCategoryId={selectedCategoryId}
+        categories={categories}
+        getCategoryNameById={getCategoryNameById}
       />
     </div>
   );

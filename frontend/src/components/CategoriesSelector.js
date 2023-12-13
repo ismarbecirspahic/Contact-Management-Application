@@ -49,9 +49,8 @@ const CategoriesSelector = ({
 const inputStyle = {
   padding: "8px",
   margin: "5px 0",
-  width: "100%",
-  boxSizing: "border-box",
   borderRadius: "4px",
+  width: "100%",
   border: "1px solid #ccc",
 };
 

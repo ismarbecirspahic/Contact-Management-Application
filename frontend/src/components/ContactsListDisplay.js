@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 
 const ContactsListDisplay = ({
   filteredContacts,
@@ -14,31 +13,15 @@ const ContactsListDisplay = ({
   setIsCategorySelected,
   setSelectedCategoryId,
   selectedCategoryId,
+  categories,
+  getCategoryNameById,
 }) => {
-  const [categories, setCategories] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get("http://localhost:3300/categories");
-      setCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
   const handleCategorySelect = (categoryId) => {
     setSelectedCategoryId(categoryId);
     setIsCategorySelected(true);
     setEditedContact({ ...editedContact, categoryId });
-  };
-
-  const getCategoryNameById = (categoryId) => {
-    const category = categories.find((cat) => cat.id === categoryId);
-    return category ? category.name : "";
   };
 
   const handleSortChange = () => {
@@ -135,8 +118,8 @@ const ContactsListDisplay = ({
       </table>
 
       {isEditModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
+        <div style={modal}>
+          <div style={modalContent}>
             <span className="close" onClick={() => setIsEditModalOpen(false)}>
               &times;
             </span>
@@ -156,7 +139,7 @@ const ContactsListDisplay = ({
                   style={inputStyle}
                 />
                 {validationErrors.firstName && (
-                  <span className="error">{validationErrors.firstName}</span>
+                  <h5 style={validationStyle}>{validationErrors.firstName}</h5>
                 )}
               </label>
               <label>
@@ -173,7 +156,7 @@ const ContactsListDisplay = ({
                   style={inputStyle}
                 />
                 {validationErrors.lastName && (
-                  <span className="error">{validationErrors.lastName}</span>
+                  <h5 style={validationStyle}>{validationErrors.lastName}</h5>
                 )}
               </label>
               <label>
@@ -190,7 +173,7 @@ const ContactsListDisplay = ({
                   style={inputStyle}
                 />
                 {validationErrors.email && (
-                  <span className="error">{validationErrors.email}</span>
+                  <h5 style={validationStyle}>{validationErrors.email}</h5>
                 )}
               </label>
               <label>
@@ -207,7 +190,9 @@ const ContactsListDisplay = ({
                   style={inputStyle}
                 />
                 {validationErrors.phone_number && (
-                  <span className="error">{validationErrors.phone_number}</span>
+                  <h5 style={validationStyle}>
+                    {validationErrors.phone_number}
+                  </h5>
                 )}
               </label>
               <label>
@@ -241,7 +226,7 @@ const ContactsListDisplay = ({
                   ))}
                 </select>
                 {validationErrors.category && (
-                  <span className="error">{validationErrors.category}</span>
+                  <h5 style={validationStyle}>{validationErrors.category}</h5>
                 )}
               </label>
               <button
@@ -266,12 +251,31 @@ const ContactsListDisplay = ({
     </>
   );
 };
+const modal = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  position: "fixed",
+  top: "0",
+  left: "0",
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+};
+
+const modalContent = {
+  backgroundColor: "#fefefe",
+  padding: "20px",
+  borderRadius: "8px",
+  width: "80%",
+  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+};
+
 const inputStyle = {
   padding: "8px",
   margin: "5px 0",
-  width: "100%",
-  boxSizing: "border-box",
   borderRadius: "4px",
+  width: "100%",
   border: "1px solid #ccc",
 };
 
@@ -294,6 +298,9 @@ const actionButtonStyle = {
   borderRadius: "4px",
   cursor: "pointer",
   marginRight: "5px",
+};
+const validationStyle = {
+  color: "red",
 };
 
 export default ContactsListDisplay;

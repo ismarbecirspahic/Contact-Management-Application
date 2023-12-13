@@ -65,6 +65,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
     try {
       await axios.delete(`http://localhost:3300/categories/${categoryId}`);
       fetchCategories();
+      setIsDeleteModalOpen(false);
       console.log(`Delete category clicked for category ID: ${categoryId}`);
     } catch (err) {
       console.error("Error while deleting data", err.message);
@@ -233,7 +234,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
           >
             Show Deleted Contacts
           </button>
-          {isDeleteModalOpen && (
+          {isDeleteModalOpen && deletedCategories.length !== 0 && (
             <div>
               <h2>Deleted Categories</h2>
               <ul style={{ overflowY: "auto", maxHeight: "150px" }}>
