@@ -1,5 +1,6 @@
 const { Category } = require("../models");
 const { Op } = require("sequelize");
+const { Contact } = require("../models");
 
 class CategoryController {
   async getAllCategories(req, res) {
@@ -53,13 +54,21 @@ class CategoryController {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
-
   async deleteCategory(req, res) {
-    const categoryId = req.params.id;
+    let categoryId = req.params.id;
 
     try {
+      // First, find and delete the category
       await Category.destroy({ where: { id: categoryId } });
-      if (categoryId === null) await Category.update({ name: "Other" });
+
+      // Then, update the contacts related to the deleted category
+      await Contact.update(
+        { categoryId: 1 },
+        { where: { categoryId: categoryId } }
+      );
+
+      console.log(categoryId);
+
       res.status(200).send("Category deletion was successful");
     } catch (err) {
       console.error("Error deleting category:", err.message);
@@ -71,9 +80,9 @@ class CategoryController {
     const categoryId = req.params.id;
     try {
       await Category.restore({ where: { id: categoryId } });
-      res.status(200).send("Contact restored successfully");
+      res.status(200).send("Category restored successfully");
     } catch (err) {
-      console.error("Error restoring a contact:", err.message);
+      console.error("Error restoring a category:", err.message);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
@@ -92,7 +101,7 @@ class CategoryController {
 
       res.status(200).json(deletedCategories);
     } catch (error) {
-      console.error("Error fetching deleted contacts:", error.message);
+      console.error("Error fetching deleted category:", error.message);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }

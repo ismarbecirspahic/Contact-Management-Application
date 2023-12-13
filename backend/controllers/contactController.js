@@ -1,4 +1,6 @@
 const { Contact } = require("../models");
+const { Category } = require("../models");
+
 const { Op } = require("sequelize");
 
 class ContactController {
@@ -42,7 +44,7 @@ class ContactController {
   }
 
   async updateContact(req, res) {
-    const contactId = req.params.id;
+    let contactId = req.params.id;
     const updatedContact = req.body;
 
     try {
