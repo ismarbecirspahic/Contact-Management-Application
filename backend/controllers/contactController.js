@@ -105,6 +105,16 @@ class ContactController {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
+
+  async restoreAllContacts(req, res) {
+    try {
+      await Contact.restore({ where: { deletedAt: { [Op.not]: null } } });
+      res.status(200).send("Contacts restored successfully");
+    } catch (err) {
+      console.error("Error restoring all Contacts:", err.message);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
 }
 
 module.exports = new ContactController();

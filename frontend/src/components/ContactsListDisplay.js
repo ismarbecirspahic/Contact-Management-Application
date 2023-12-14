@@ -18,7 +18,6 @@ const ContactsListDisplay = ({
   getCategoryNameById,
   fetchContacts,
   fetchDeletedContacts,
-  setIsDeleteModalOpen,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -34,7 +33,6 @@ const ContactsListDisplay = ({
     try {
       await axios.delete("http://localhost:3300/contacts");
       fetchContacts();
-      setIsDeleteModalOpen(false);
       fetchDeletedContacts();
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -129,23 +127,20 @@ const ContactsListDisplay = ({
                     margin: "0 10px",
                   }}
                 >
-                  <button
-                    style={actionButtonStyle}
-                    onClick={() => handleUpdateContact(contact.id, contact)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    style={{
-                      backgroundColor: "red",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px",
-                    }}
-                    onClick={() => handleDeleteContact(contact.id)}
-                  >
-                    Delete
-                  </button>
+                  <div style={{ display: "flex", gap: "5px" }}>
+                    <button
+                      style={addButtonStyle}
+                      onClick={() => handleUpdateContact(contact.id, contact)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      style={deleteButtonStyle}
+                      onClick={() => handleDeleteContact(contact.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -186,6 +181,7 @@ const ContactsListDisplay = ({
               backgroundColor: currentPage === index + 1 ? "#4CAF50" : "white",
               color: currentPage === index + 1 ? "white" : "#4CAF50",
               border: "2px solid #4CAF50",
+              borderRadius: "4px",
               cursor: "pointer",
               fontWeight: "bold",
             }}
@@ -194,22 +190,16 @@ const ContactsListDisplay = ({
             {index + 1}
           </button>
         ))}
-        <button
-          style={{
-            marginRight: "5px",
-            padding: "5px 10px",
-            backgroundColor: "red",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-          onClick={() => {
-            deleteAllContacts();
-          }}
-        >
-          Delete All
-        </button>
+        {sortedContacts.length !== 0 && (
+          <button
+            style={deleteButtonStyle}
+            onClick={() => {
+              deleteAllContacts();
+            }}
+          >
+            Delete All
+          </button>
+        )}
       </div>
 
       {isEditModalOpen && (
@@ -394,17 +384,27 @@ const tableRowStyle = {
   textAlign: "center",
 };
 
-const actionButtonStyle = {
+const validationStyle = {
+  color: "red",
+};
+
+const addButtonStyle = {
   backgroundColor: "#4CAF50",
   color: "white",
   padding: "10px 15px",
   border: "none",
   borderRadius: "4px",
   cursor: "pointer",
-  marginRight: "5px",
+  fontWeight: "bold",
 };
-const validationStyle = {
-  color: "red",
+const deleteButtonStyle = {
+  backgroundColor: "red",
+  color: "white",
+  padding: "10px 15px",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
+  fontWeight: "bold",
 };
 
 export default ContactsListDisplay;

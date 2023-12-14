@@ -116,6 +116,15 @@ class CategoryController {
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
+  async restoreAllCategories(req, res) {
+    try {
+      await Category.restore({ where: { deletedAt: { [Op.not]: null } } });
+      res.status(200).send("Categories restored successfully");
+    } catch (err) {
+      console.error("Error restoring all Categories:", err.message);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
 }
 
 module.exports = new CategoryController();

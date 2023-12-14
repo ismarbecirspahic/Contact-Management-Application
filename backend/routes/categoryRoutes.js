@@ -11,5 +11,6 @@ router.put("/:id", CategoryController.updateCategory);
 router.delete("/:id", CategoryController.deleteCategory);
 router.put("/restore/:id", CategoryController.restoreCategory);
 router.delete("/", CategoryController.deleteAllCategories);
+router.put("/", CategoryController.restoreAllCategories);
 
 module.exports = router;

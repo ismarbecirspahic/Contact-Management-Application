@@ -102,7 +102,6 @@ const ContactsList = ({
 
         fetchContacts();
         setIsEditModalOpen(false);
-        console.log(`Edit contact clicked for contact ID: ${contactId}`);
       } catch (error) {
         console.error("Error updating contact:", error.message);
       }

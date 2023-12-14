@@ -193,6 +193,9 @@ const App = () => {
         isDeleteModalOpen={isDeleteModalOpen}
         handleRestoreContact={handleRestoreContact}
         categories={categories}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
+        fetchContacts={fetchContacts}
+        fetchDeletedContacts={fetchDeletedContacts}
       />
 
       <ContactsModal

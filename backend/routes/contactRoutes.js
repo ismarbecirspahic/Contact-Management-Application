@@ -11,5 +11,6 @@ router.put("/:id", contactController.updateContact);
 router.delete("/:id", contactController.deleteContact);
 router.put("/restore/:id", contactController.restoreContact);
 router.delete("/", contactController.deleteAllContacts);
+router.put("/", contactController.restoreAllContacts);
 
 module.exports = router;
