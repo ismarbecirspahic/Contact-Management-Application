@@ -26,6 +26,15 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
     }
   };
 
+  const deleteAllCategories = async () => {
+    try {
+      await axios.delete("http://localhost:3300/categories");
+      fetchCategories();
+    } catch (error) {
+      console.error("Error deleting all categories:", error);
+    }
+  };
+
   const handleAddCategory = () => {
     setCategory({
       name: "",
@@ -55,7 +64,6 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
       );
       fetchCategories();
       setisEditModalOpen(false);
-      console.log(`Edit category clicked for category ID: ${categoryId}`);
     } catch (error) {
       console.error("Error updating category:", error.message);
     }
@@ -66,7 +74,6 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
       await axios.delete(`http://localhost:3300/categories/${categoryId}`);
       fetchCategories();
       setIsDeleteModalOpen(false);
-      console.log(`Delete category clicked for category ID: ${categoryId}`);
     } catch (err) {
       console.error("Error while deleting data", err.message);
     }
@@ -185,21 +192,30 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
               </form>
             </div>
           )}
-          <button
-            type="button"
-            style={addButtonStyle}
-            onClick={handleAddCategory}
-          >
-            Add Category
-          </button>
+          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+            <button
+              type="button"
+              style={addButtonStyle}
+              onClick={handleAddCategory}
+            >
+              Add Category
+            </button>
 
-          <button
-            type="button"
-            style={showDeletedButtonStyle}
-            onClick={handleShowDeletedCategories}
-          >
-            Show Deleted Contacts
-          </button>
+            <button
+              type="button"
+              style={showDeletedButtonStyle}
+              onClick={handleShowDeletedCategories}
+            >
+              Show Deleted Categories
+            </button>
+            <button
+              type="button"
+              style={deleteButtonStyle}
+              onClick={() => deleteAllCategories()}
+            >
+              Delete All Categories
+            </button>
+          </div>
           {isDeleteModalOpen && deletedCategories.length !== 0 && (
             <div>
               <h2>Deleted Categories</h2>
@@ -285,14 +301,13 @@ const addButtonStyle = {
   border: "none",
   borderRadius: "4px",
   cursor: "pointer",
-  marginBottom: "10px",
 };
 
 const showDeletedButtonStyle = {
   backgroundColor: "white",
-  color: "#4CAF50",
+  color: "red",
   padding: "10px 15px",
-  border: "2px solid #4CAF50",
+  border: "2px solid red",
   borderRadius: "4px",
   cursor: "pointer",
 };

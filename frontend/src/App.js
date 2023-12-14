@@ -192,6 +192,7 @@ const App = () => {
         deletedContacts={deletedContacts}
         isDeleteModalOpen={isDeleteModalOpen}
         handleRestoreContact={handleRestoreContact}
+        categories={categories}
       />
 
       <ContactsModal

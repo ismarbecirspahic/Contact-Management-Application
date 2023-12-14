@@ -1,5 +1,5 @@
 const { Category } = require("../models");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { Contact } = require("../models");
 
 class CategoryController {
@@ -58,20 +58,31 @@ class CategoryController {
     let categoryId = req.params.id;
 
     try {
-      // First, find and delete the category
       await Category.destroy({ where: { id: categoryId } });
-
-      // Then, update the contacts related to the deleted category
       await Contact.update(
         { categoryId: 1 },
         { where: { categoryId: categoryId } }
       );
 
-      console.log(categoryId);
-
       res.status(200).send("Category deletion was successful");
     } catch (err) {
       console.error("Error deleting category:", err.message);
+      res.status(500).json({ err: "Internal Server Error" });
+    }
+  }
+  async deleteAllCategories(req, res) {
+    try {
+      await Category.destroy({
+        truncate: true,
+        where: { id: { [Op.not]: 1 } },
+      });
+      await Contact.update(
+        { categoryId: 1 },
+        { where: { categoryId: { [Op.not]: 1 } } }
+      );
+      res.status(200).send("All Categories deleted");
+    } catch (err) {
+      console.error("Error while deleting all Categories:", err.message);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }

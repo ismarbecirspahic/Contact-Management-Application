@@ -6,7 +6,12 @@ const ContactsActions = ({
   deletedContacts,
   isDeleteModalOpen,
   handleRestoreContact,
+  categories,
 }) => {
+  const getDeletedContactNameById = (deleteId) => {
+    const deleteContact = categories.find((cat) => cat.id === deleteId);
+    return deleteContact ? deleteContact.name : "";
+  };
   return (
     <div
       style={{
@@ -88,7 +93,7 @@ const ContactsActions = ({
                     {deletedContact.address}
                   </td>
                   <td style={{ textAlign: "center" }}>
-                    {deletedContact.categoryId}
+                    {getDeletedContactNameById(deletedContact.categoryId)}
                   </td>
                   <td style={{ textAlign: "center" }}>
                     <button

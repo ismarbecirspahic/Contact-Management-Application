@@ -144,7 +144,10 @@ const ContactsList = ({
         setSelectedCategoryId={setSelectedCategoryId}
         selectedCategoryId={selectedCategoryId}
         categories={categories}
+        fetchContacts={fetchContacts}
         getCategoryNameById={getCategoryNameById}
+        fetchDeletedContacts={fetchDeletedContacts}
+        setIsDeleteModalOpen={setIsDeleteModalOpen}
       />
     </div>
   );

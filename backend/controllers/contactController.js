@@ -67,6 +67,15 @@ class ContactController {
     }
   }
 
+  async deleteAllContacts(req, res) {
+    try {
+      await Contact.destroy({ truncate: true });
+      res.status(200).send("All contacts deleted");
+    } catch (err) {
+      console.error("Error while deleting all contacts:", err.message);
+    }
+  }
+
   async restoreContact(req, res) {
     const contactId = req.params.id;
     try {

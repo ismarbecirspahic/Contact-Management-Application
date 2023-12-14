@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const ContactsListDisplay = ({
   filteredContacts,
@@ -15,7 +16,36 @@ const ContactsListDisplay = ({
   selectedCategoryId,
   categories,
   getCategoryNameById,
+  fetchContacts,
+  fetchDeletedContacts,
+  setIsDeleteModalOpen,
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentContacts = filteredContacts.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const deleteAllContacts = async () => {
+    try {
+      await axios.delete("http://localhost:3300/contacts");
+      fetchContacts();
+      setIsDeleteModalOpen(false);
+      fetchDeletedContacts();
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const totalPages = Math.ceil(filteredContacts.length / itemsPerPage);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
   const [sortOrder, setSortOrder] = useState("asc");
 
   const handleCategorySelect = (categoryId) => {
@@ -28,7 +58,7 @@ const ContactsListDisplay = ({
     setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
   };
 
-  const sortedContacts = [...filteredContacts].sort((a, b) => {
+  const sortedContacts = [...currentContacts].sort((a, b) => {
     const categoryA = getCategoryNameById(a.categoryId);
     const categoryB = getCategoryNameById(b.categoryId);
 
@@ -70,52 +100,117 @@ const ContactsListDisplay = ({
             <th style={{ padding: "30px", margin: "0 10px" }}>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          {sortedContacts.map((contact) => (
-            <tr key={contact.id} style={tableRowStyle}>
-              <td style={{ padding: "10px", margin: "0 10px" }}>
-                {contact.firstName}
-              </td>
-              <td style={{ padding: "10px", margin: "0 10px" }}>
-                {contact.lastName}
-              </td>
-              <td style={{ padding: "10px", margin: "0 10px" }}>
-                {contact.email}
-              </td>
-              <td style={{ padding: "10px", margin: "0 10px" }}>
-                {contact.phone_number}
-              </td>
-              <td style={{ padding: "10px", margin: "0 10px" }}>
-                {contact.address}
-              </td>
-              <td style={{ padding: "10px", margin: "0 10px" }}>
-                {getCategoryNameById(contact.categoryId)}
-              </td>
-              <td
-                style={{ display: "flex", padding: "10px", margin: "0 10px" }}
-              >
-                <button
-                  style={actionButtonStyle}
-                  onClick={() => handleUpdateContact(contact.id, contact)}
-                >
-                  Edit
-                </button>
-                <button
+        {sortedContacts.length !== 0 ? (
+          <tbody>
+            {sortedContacts.map((contact) => (
+              <tr key={contact.id} style={tableRowStyle}>
+                <td style={{ padding: "10px", margin: "0 10px" }}>
+                  {contact.firstName}
+                </td>
+                <td style={{ padding: "10px", margin: "0 10px" }}>
+                  {contact.lastName}
+                </td>
+                <td style={{ padding: "10px", margin: "0 10px" }}>
+                  {contact.email}
+                </td>
+                <td style={{ padding: "10px", margin: "0 10px" }}>
+                  {contact.phone_number}
+                </td>
+                <td style={{ padding: "10px", margin: "0 10px" }}>
+                  {contact.address}
+                </td>
+                <td style={{ padding: "10px", margin: "0 10px" }}>
+                  {getCategoryNameById(contact.categoryId)}
+                </td>
+                <td
                   style={{
-                    backgroundColor: "red",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
+                    display: "flex",
+                    padding: "10px",
+                    margin: "0 10px",
                   }}
-                  onClick={() => handleDeleteContact(contact.id)}
                 >
-                  Delete
-                </button>
+                  <button
+                    style={actionButtonStyle}
+                    onClick={() => handleUpdateContact(contact.id, contact)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    style={{
+                      backgroundColor: "red",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                    }}
+                    onClick={() => handleDeleteContact(contact.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        ) : (
+          <tbody>
+            <tr
+              style={{
+                borderBottom: "1px solid #ddd",
+                textAlign: "center",
+                display: "flex",
+                justifyContent: "center",
+                padding: "10px 0",
+              }}
+            >
+              <td
+                style={{
+                  textAlign: "center",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                }}
+              >
+                No contacts to be displayed
               </td>
             </tr>
-          ))}
-        </tbody>
+          </tbody>
+        )}
       </table>
+      <div
+        style={{ marginTop: "10px", display: "flex", justifyContent: "center" }}
+      >
+        {Array.from({ length: totalPages }).map((_, index) => (
+          <button
+            key={index}
+            style={{
+              marginRight: "5px",
+              padding: "5px 10px",
+              backgroundColor: currentPage === index + 1 ? "#4CAF50" : "white",
+              color: currentPage === index + 1 ? "white" : "#4CAF50",
+              border: "2px solid #4CAF50",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
+            onClick={() => handlePageChange(index + 1)}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          style={{
+            marginRight: "5px",
+            padding: "5px 10px",
+            backgroundColor: "red",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+          onClick={() => {
+            deleteAllContacts();
+          }}
+        >
+          Delete All
+        </button>
+      </div>
 
       {isEditModalOpen && (
         <div style={modal}>
