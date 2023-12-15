@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";
 
 import ContactsListDisplay from "./ContactsListDisplay";
+import { deleteContact, updateContact } from "../services/ContactService";
+import ValidateForm from "./ValidateForm";
 
 const ContactsList = ({
-  filteredContacts,
   fetchContacts,
   deletedContacts,
   fetchDeletedContacts,
@@ -14,6 +14,8 @@ const ContactsList = ({
   selectedCategoryId,
   categories,
   getCategoryNameById,
+  contacts,
+  searchTerm,
   setIsDeleteModalOpen,
 }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -35,47 +37,6 @@ const ContactsList = ({
     phone_number: "",
   });
 
-  const validateEditForm = () => {
-    let isValid = true;
-    const errors = {};
-
-    if (!editedContact.firstName.trim()) {
-      errors.firstName = "First Name cannot be empty";
-      isValid = false;
-    } else if (!/^[A-Z][a-z]*$/.test(editedContact.firstName)) {
-      errors.firstName =
-        "First Name must start with a capital letter and contain only letters";
-      isValid = false;
-    }
-
-    if (!editedContact.lastName.trim()) {
-      errors.lastName = "Last Name cannot be empty";
-      isValid = false;
-    } else if (!/^[A-Z][a-z]*$/.test(editedContact.lastName)) {
-      errors.lastName =
-        "Last Name must start with a capital letter and contain only letters";
-      isValid = false;
-    }
-    if (!editedContact.email.trim()) {
-      errors.email = "Email cannot be empty";
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(editedContact.email)) {
-      errors.email = "Invalid email format";
-      isValid = false;
-    }
-
-    if (!editedContact.phone_number.trim()) {
-      errors.phone_number = "Phone Number is required";
-      isValid = false;
-    } else if (!/^\d{1,9}$/.test(editedContact.phone_number)) {
-      errors.phone_number = "Phone Number must be a maximum of 9 digits";
-      isValid = false;
-    }
-
-    setValidationErrors(errors);
-    return isValid;
-  };
-
   const handleUpdateContact = (contactId, contact) => {
     setIsEditModalOpen(true);
     setEditedContact({
@@ -88,33 +49,26 @@ const ContactsList = ({
       categoryId: contact.categoryId,
     });
   };
-
   const handleEditContact = async (e, contactId) => {
     e.preventDefault();
-
-    if (validateEditForm()) {
-      try {
-        await axios.put(
-          `http://localhost:3300/contacts/${contactId}`,
-          editedContact
-        );
-        setSelectedCategoryId("");
-
-        fetchContacts();
-        setIsEditModalOpen(false);
-      } catch (error) {
-        console.error("Error updating contact:", error.message);
-      }
+    const { isValid, errors } = ValidateForm(editedContact);
+    if (isValid) {
+      await updateContact(contactId, editedContact);
+      setSelectedCategoryId("");
+      fetchContacts();
+      setIsEditModalOpen(false);
+    } else {
+      setValidationErrors(errors);
+      console.log("Validation Errors:", errors);
     }
   };
 
   const handleDeleteContact = async (contactId) => {
     try {
-      await axios.delete(`http://localhost:3300/contacts/${contactId}`);
+      await deleteContact(contactId);
       fetchContacts();
       fetchDeletedContacts();
       setIsDeleteModalOpen(false);
-      console.log(`Delete contact clicked for contact ID: ${contactId}`);
     } catch (err) {
       console.error("Error while deleting data", err.message);
     }
@@ -128,7 +82,6 @@ const ContactsList = ({
       }}
     >
       <ContactsListDisplay
-        filteredContacts={filteredContacts}
         handleUpdateContact={handleUpdateContact}
         handleDeleteContact={handleDeleteContact}
         deletedContacts={deletedContacts}
@@ -143,6 +96,8 @@ const ContactsList = ({
         setSelectedCategoryId={setSelectedCategoryId}
         selectedCategoryId={selectedCategoryId}
         categories={categories}
+        contacts={contacts}
+        searchTerm={searchTerm}
         fetchContacts={fetchContacts}
         getCategoryNameById={getCategoryNameById}
         fetchDeletedContacts={fetchDeletedContacts}

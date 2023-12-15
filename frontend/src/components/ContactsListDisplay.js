@@ -1,8 +1,9 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import FilterContacts from "./FilterContacts";
+
+import { deleteContacts } from "../services/ContactService";
 
 const ContactsListDisplay = ({
-  filteredContacts,
   handleUpdateContact,
   handleDeleteContact,
   isEditModalOpen,
@@ -15,10 +16,18 @@ const ContactsListDisplay = ({
   setSelectedCategoryId,
   selectedCategoryId,
   categories,
+  contacts,
+  searchTerm,
   getCategoryNameById,
   fetchContacts,
   fetchDeletedContacts,
 }) => {
+  const [filteredContacts, setFilteredContacts] = useState([]);
+
+  useEffect(() => {
+    const filtered = FilterContacts(contacts, searchTerm, getCategoryNameById);
+    setFilteredContacts(filtered);
+  }, [contacts, searchTerm, getCategoryNameById]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -31,7 +40,7 @@ const ContactsListDisplay = ({
 
   const deleteAllContacts = async () => {
     try {
-      await axios.delete("http://localhost:3300/contacts");
+      await deleteContacts();
       fetchContacts();
       fetchDeletedContacts();
     } catch (error) {

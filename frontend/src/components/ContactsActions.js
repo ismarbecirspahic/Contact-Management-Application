@@ -1,17 +1,46 @@
-import axios from "axios";
 import React from "react";
 
+import { restoreContacts, restoreContact } from "../services/ContactService";
+
 const ContactsActions = ({
-  handleAddContact,
-  handleShowDeletedContacts,
+  setContact,
+  setIsModalOpen,
   deletedContacts,
   isDeleteModalOpen,
-  handleRestoreContact,
   categories,
   setIsDeleteModalOpen,
   fetchContacts,
   fetchDeletedContacts,
 }) => {
+  //handleAddContact
+
+  const handleAddContact = () => {
+    setContact({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone_number: "",
+      address: "",
+      categoryId: null,
+    });
+    setIsModalOpen(true);
+  };
+  //handleShowDeletedContacts
+  const handleShowDeletedContacts = () => {
+    setIsDeleteModalOpen(!isDeleteModalOpen);
+    fetchDeletedContacts();
+  };
+  //handleRestoreContact
+  const handleRestoreContact = async (deletedContactId) => {
+    try {
+      await restoreContact(deletedContactId);
+      fetchContacts();
+      fetchDeletedContacts();
+    } catch (error) {
+      console.error("Error restoring contact:", error.message);
+    }
+  };
+
   const getDeletedContactNameById = (deleteId) => {
     const deleteContact = categories.find((cat) => cat.id === deleteId);
     return deleteContact ? deleteContact.name : "";
@@ -19,7 +48,7 @@ const ContactsActions = ({
 
   const restoreAllContacts = async () => {
     try {
-      await axios.put("http://localhost:3300/contacts");
+      await restoreContacts();
       fetchContacts();
       setIsDeleteModalOpen(false);
       fetchDeletedContacts();

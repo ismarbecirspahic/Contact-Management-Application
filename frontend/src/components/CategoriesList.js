@@ -1,8 +1,17 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import "../App.css";
+import {
+  fetchCategories,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+  deleteAllCategories,
+  fetchDeletedCategories,
+  restoreCategory,
+  restoreAllCategories,
+} from "../services/CategoryService";
 
-const CategoriesList = ({ fetchContacts, category, setCategory }) => {
+const CategoriesList = ({ category, setCategory }) => {
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setisEditModalOpen] = useState(false);
@@ -14,31 +23,19 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchCategories();
+    fetchAllCategories();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchAllCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:3300/categories");
-      setCategories(response.data);
+      const categoriesData = await fetchCategories();
+      setCategories(categoriesData);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
-  const deleteAllCategories = async () => {
-    try {
-      await axios.delete("http://localhost:3300/categories");
-
-      setIsDeleteModalOpen(false);
-      fetchCategories();
-      fetchDeletedCategories();
-    } catch (error) {
-      console.error("Error deleting all categories:", error);
-    }
-  };
-
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     setCategory({
       name: "",
     });
@@ -61,11 +58,8 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
     e.preventDefault();
 
     try {
-      await axios.put(
-        `http://localhost:3300/categories/${categoryId}`,
-        editedcategory
-      );
-      fetchCategories();
+      await updateCategory(categoryId, editedcategory);
+      fetchAllCategories();
       setisEditModalOpen(false);
     } catch (error) {
       console.error("Error updating category:", error.message);
@@ -74,27 +68,25 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
 
   const handleDeleteCategory = async (categoryId) => {
     try {
-      await axios.delete(`http://localhost:3300/categories/${categoryId}`);
-      fetchCategories();
+      await deleteCategory(categoryId);
+      fetchAllCategories();
       setIsDeleteModalOpen(false);
-      fetchDeletedCategories();
+      fetchAllDeletedCategories();
     } catch (err) {
-      console.error("Error while deleting data", err.message);
+      console.error("Error while deleting category", err.message);
     }
   };
 
   const handleSaveCategory = async () => {
-    await axios.post("http://localhost:3300/categories", category);
-    fetchCategories();
+    await addCategory(category);
+    fetchAllCategories();
     setIsModalOpen(false);
   };
 
-  const fetchDeletedCategories = async () => {
+  const fetchAllDeletedCategories = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3300/categories/deleted"
-      );
-      setDeletedCategories(response.data);
+      const deletedCategoriesData = await fetchDeletedCategories();
+      setDeletedCategories(deletedCategoriesData);
     } catch (error) {
       console.error("Error fetching deleted categories:", error);
     }
@@ -102,23 +94,21 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
 
   const handleRestoreCategory = async (deletedCategoryId) => {
     try {
-      await axios.put(
-        `http://localhost:3300/categories/restore/${deletedCategoryId}`
-      );
-      fetchCategories();
-      fetchDeletedCategories();
+      await restoreCategory(deletedCategoryId);
+      fetchAllCategories();
+      fetchAllDeletedCategories();
     } catch (error) {
-      console.error("Error restoring contact:", error.message);
+      console.error("Error restoring category:", error.message);
     }
   };
 
-  const restoreAllCategories = async () => {
+  const restoreCategories = async () => {
     try {
-      await axios.put("http://localhost:3300/categories");
-      fetchCategories();
-      fetchDeletedCategories();
+      await restoreAllCategories();
+      fetchAllCategories();
+      fetchAllDeletedCategories();
     } catch (error) {
-      console.error("Error restoring contact:", error.message);
+      console.error("Error restoring all categories:", error.message);
     }
   };
 
@@ -126,14 +116,30 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
     setIsDeleteModalOpen(!isDeleteModalOpen);
     setIsModalOpen(false);
     setisEditModalOpen(false);
-    fetchDeletedCategories();
+    fetchAllDeletedCategories();
+  };
+
+  const deleteCategories = async () => {
+    try {
+      await deleteAllCategories();
+
+      setIsDeleteModalOpen(false);
+      fetchAllCategories();
+      fetchAllDeletedCategories();
+    } catch (error) {
+      console.error("Error deleting all categories:", error);
+    }
   };
 
   return (
     <div>
       <div style={categoryStyle}>
         <div
-          style={{ textAlign: "center", overflowY: "auto", maxHeight: "300px" }}
+          style={{
+            textAlign: "center",
+            overflow: "auto",
+            maxHeight: "300px",
+          }}
         >
           <h2
             style={{
@@ -148,7 +154,12 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
           >
             Categories
           </h2>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+            }}
+          >
             <thead>
               <tr style={tableHeaderStyle}>
                 <th style={{ padding: "30px", margin: "0 10px" }}>
@@ -157,6 +168,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
                 <th style={{ padding: "30px", margin: "0 10px" }}>Actions</th>
               </tr>
             </thead>
+
             <tbody>
               {categories.map((category) => (
                 <tr
@@ -255,18 +267,18 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
               Show Deleted Categories
             </button>
 
-            {categories.length !== 1 ? (
+            {categories.length !== 1 && deletedCategories.length === 0 ? (
               <button
                 type="button"
                 style={deleteButtonStyle}
-                onClick={() => deleteAllCategories()}
+                onClick={() => deleteCategories()}
               >
                 Delete All Categories
               </button>
             ) : (
               <button
                 style={addButtonStyle}
-                onClick={() => restoreAllCategories()}
+                onClick={() => restoreCategories()}
               >
                 Restore All Categories
               </button>
@@ -303,7 +315,7 @@ const CategoriesList = ({ fetchContacts, category, setCategory }) => {
               </ul>
               <button
                 style={addButtonStyle}
-                onClick={() => restoreAllCategories()}
+                onClick={() => restoreCategories()}
               >
                 Restore All Categories
               </button>
@@ -467,11 +479,6 @@ const buttonContainerStyle = {
 const tableHeaderStyle = {
   backgroundColor: "#4CAF50",
   color: "white",
-  textAlign: "center",
-};
-
-const tableRowStyle = {
-  borderBottom: "1px solid #ddd",
   textAlign: "center",
 };
 
